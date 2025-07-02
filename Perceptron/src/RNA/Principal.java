@@ -1,0 +1,64 @@
+package RNA;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Principal {
+
+    public static void main(String[] args) {
+
+        System.out.println("Exemplo de RNA Perceptron para classificação de equipes: ");
+
+        List<Ponto> amostras = new ArrayList<Ponto>();
+        List<Integer> saidas = new ArrayList<>();
+
+        Scanner sc = new Scanner(System.in);
+        String Arquivo = "listaTimes.txt";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(Arquivo))) {
+
+            String linha;
+
+            while ((linha = br.readLine()) != null) {
+                String[] partes = linha.split(";");
+                if (partes.length >= 3) {
+                    double x = Double.parseDouble(partes[0]);
+                    double y = Double.parseDouble(partes[1]);
+                    int saida = Integer.parseInt(partes[2]);
+
+                    amostras.add(new Ponto(x, y));
+                    saidas.add(saida);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+        }
+
+        double taxa_aprendizado = 0.1;
+        int geracoes = 1000;
+        int limiar = 1;
+
+        Perceptron p = new Perceptron(amostras, saidas, taxa_aprendizado, geracoes, limiar);
+        p.treinar();
+        String op;
+
+        do {
+            System.out.println("\n\nInforme valor para x (-1 à 1): ");
+            double x = Double.parseDouble(sc.nextLine());
+            System.out.println("Informe valor para y (-1 à 1): ");
+            double y = Double.parseDouble(sc.nextLine());
+
+            p.testar(new Ponto(x,y));
+            System.out.println("1 - Sair: ");
+            op = sc.nextLine();
+
+        } while (op != "1");
+
+        sc.close();
+    }
+
+}
